@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://c3rt81sglhq7j"]
+[gd_scene load_steps=3 format=3 uid="uid://c3rt81sglhq7j"]
 
 [ext_resource type="Script" uid="uid://c4u4dj3t2tsn7" path="res://Scripts/Main/Main.cs" id="1_r150o"]
+[ext_resource type="Script" uid="uid://bjcdqtirtderj" path="res://Scripts/Debug/FreeCam/FreeCamCamera2D.cs" id="2_idj7w"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_r150o")
@@ -13,5 +14,6 @@ script = ExtResource("1_r150o")
 
 [node name="Camera2D" type="Camera2D" parent="WorldRoot"]
 zoom = Vector2(0.25, 0.25)
+script = ExtResource("2_idj7w")
 
 [node name="DebugUI" type="CanvasLayer" parent="."]
