@@ -1,14 +1,19 @@
-[gd_scene load_steps=3 format=3 uid="uid://c3rt81sglhq7j"]
+[gd_scene load_steps=5 format=3 uid="uid://c3rt81sglhq7j"]
 
 [ext_resource type="Script" uid="uid://c4u4dj3t2tsn7" path="res://Scripts/Main/Main.cs" id="1_r150o"]
 [ext_resource type="Script" uid="uid://bjcdqtirtderj" path="res://Scripts/Debug/FreeCam/FreeCamCamera2D.cs" id="2_idj7w"]
+[ext_resource type="Script" uid="uid://dfn0csysmgrik" path="res://Scripts/Debug/Biomes/BiomeChunkDebugRenderer.cs" id="2_rgh2o"]
+[ext_resource type="Script" uid="uid://cc5woforrv1sr" path="res://Scripts/Debug/UI/SeedControllerUI.cs" id="3_kln2b"]
 
-[node name="Main" type="Node2D"]
+[node name="Main" type="Node2D" node_paths=PackedStringArray("_renderer", "_seedUi")]
 script = ExtResource("1_r150o")
+_renderer = NodePath("WorldRoot/BiomeChunkDebug")
+_seedUi = NodePath("DebugUI")
 
 [node name="WorldRoot" type="Node2D" parent="."]
 
 [node name="BiomeChunkDebug" type="Node2D" parent="WorldRoot"]
+script = ExtResource("2_rgh2o")
 
 [node name="TerrainDebug" type="Node2D" parent="WorldRoot"]
 
@@ -16,4 +21,34 @@ script = ExtResource("1_r150o")
 zoom = Vector2(0.25, 0.25)
 script = ExtResource("2_idj7w")
 
-[node name="DebugUI" type="CanvasLayer" parent="."]
+[node name="DebugUI" type="CanvasLayer" parent="." node_paths=PackedStringArray("SeedEdit", "RandomiseButton", "RegenerateButton", "RegenTarget")]
+script = ExtResource("3_kln2b")
+SeedEdit = NodePath("Panel/Row/SeedEdit")
+RandomiseButton = NodePath("Panel/Row/RandomiseButton")
+RegenerateButton = NodePath("Panel/Row/RegenerateButton")
+RegenTarget = NodePath("..")
+
+[node name="Panel" type="PanelContainer" parent="DebugUI"]
+custom_minimum_size = Vector2(300, 0)
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Row" type="HBoxContainer" parent="DebugUI/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="SeedLabel" type="Label" parent="DebugUI/Panel/Row"]
+layout_mode = 2
+text = "Seed: "
+vertical_alignment = 1
+
+[node name="SeedEdit" type="LineEdit" parent="DebugUI/Panel/Row"]
+layout_mode = 2
+
+[node name="RandomiseButton" type="Button" parent="DebugUI/Panel/Row"]
+layout_mode = 2
+text = "Randomise"
+
+[node name="RegenerateButton" type="Button" parent="DebugUI/Panel/Row"]
+layout_mode = 2
+text = "Regenerate"

@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using BiomeArchitectV2.Core;
+using BiomeArchitectV2.Biomes.Generation;
 
 namespace BiomeArchitectV2.Debug.Biomes
 {
@@ -8,6 +9,7 @@ namespace BiomeArchitectV2.Debug.Biomes
     {
         private WorldConfig _config = null!;
         private int _seed;
+        private BiomeArchitectV2.Biomes.Generation.RegionBands _bands = null!;
 
         [Export] public bool ShowGridLines { get; set; } = true;
         [Export] public bool ShowFill { get; set; } = true;
@@ -15,10 +17,11 @@ namespace BiomeArchitectV2.Debug.Biomes
 
 
 
-        public void Init(WorldConfig config, int seed)
+        public void Init(WorldConfig config, int seed, RegionBands bands)
         {
             _config = config;
             _seed = seed;
+            _bands = bands;
             QueueRedraw();
         }
 
@@ -43,7 +46,8 @@ namespace BiomeArchitectV2.Debug.Biomes
 
                     if (ShowFill)
                     {
-                        Color fill = GetDeterministicChunkColor(cx, cy, _seed);
+                        var region = _bands.GetRegionForChunkRow(cy);
+                        Color fill = GetRegionGreyscale(region);
                         DrawRect(rect, fill, filled: true);
                     }
                 }
@@ -52,24 +56,14 @@ namespace BiomeArchitectV2.Debug.Biomes
 
 
 
-        private static Color GetDeterministicChunkColor(int cx, int cy, int seed)
+        private static Color GetRegionGreyscale(RegionId region)
         {
-            int h = seed;
-            h = unchecked(h * 31 + cx);
-            h = unchecked(h * 31 + cy);
-            h ^= (h << 13);
-            h ^= (h >> 17);
-            h ^= (h << 5);
-
-            float r = ((h >> 0) & 0xFF) / 255f;
-            float g = ((h >> 8) & 0xFF) / 255f;
-            float b = ((h >> 16) & 0xFF) / 255f;
-
-            r = 0.25f + 0.75f * r;
-            g = 0.25f + 0.75f * g;
-            b = 0.25f + 0.75f * b;
-
-            return new Color(r, g, b, 1f);
+            return region switch
+            {
+                RegionId.Sky => new Color(0.80f, 0.80f, 0.80f, 1f),
+                RegionId.Surface => new Color(0.55f, 0.55f, 0.55f, 1f),
+                _ => new Color(0.20f, 0.20f, 0.20f, 1f),
+            };
         }
     }
 }
