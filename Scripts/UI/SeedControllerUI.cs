@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-namespace BiomeArchitectV2.Debug.UI
+namespace BiomeArchitectV2.UI
 {
     public sealed partial class SeedControllerUI : CanvasLayer
     {

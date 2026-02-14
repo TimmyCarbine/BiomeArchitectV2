@@ -1,9 +1,9 @@
 using Godot;
 using BiomeArchitectV2.Core;
 using BiomeArchitectV2.Debug.Biomes;
-using BiomeArchitectV2.Debug.UI;
 using BiomeArchitectV2.Biomes.Generation;
 using BiomeArchitectV2.Biomes.Catalog;
+using BiomeArchitectV2.UI;
 
 namespace BiomeArchitectV2
 {
@@ -61,8 +61,7 @@ namespace BiomeArchitectV2
             foreach (var region in result.Regions)
             {
                 GD.Print($"[BiomeArchitectV2] {region.Region, -11} | Bands = {region.BandHeight, 2} | Area = {region.Area, 4} | Target = {region.TargetCount, 2} | " +
-                        $"Selected = {region.SelectedBiomes.Count, 2} => " +
-                        string.Join(", ", region.SelectedBiomes));
+                        $"Selected = {region.SelectedBiomes.Count, 2} => {string.Join(", ", region.SelectedBiomes)}");
             }
         }
     }

@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://c4u4dj3t2tsn7" path="res://Scripts/Main/Main.cs" id="1_r150o"]
 [ext_resource type="Script" uid="uid://bjcdqtirtderj" path="res://Scripts/Debug/FreeCam/FreeCamCamera2D.cs" id="2_idj7w"]
 [ext_resource type="Script" uid="uid://dfn0csysmgrik" path="res://Scripts/Debug/Biomes/BiomeChunkDebugRenderer.cs" id="2_rgh2o"]
-[ext_resource type="Script" uid="uid://cc5woforrv1sr" path="res://Scripts/Debug/UI/SeedControllerUI.cs" id="3_kln2b"]
+[ext_resource type="Script" uid="uid://cc5woforrv1sr" path="res://Scripts/UI/SeedControllerUI.cs" id="4_rgh2o"]
 
 [node name="Main" type="Node2D" node_paths=PackedStringArray("_renderer", "_seedUi")]
 script = ExtResource("1_r150o")
@@ -22,7 +22,7 @@ zoom = Vector2(0.25, 0.25)
 script = ExtResource("2_idj7w")
 
 [node name="DebugUI" type="CanvasLayer" parent="." node_paths=PackedStringArray("SeedEdit", "RandomiseButton", "RegenerateButton", "RegenTarget")]
-script = ExtResource("3_kln2b")
+script = ExtResource("4_rgh2o")
 SeedEdit = NodePath("Panel/Row/SeedEdit")
 RandomiseButton = NodePath("Panel/Row/RandomiseButton")
 RegenerateButton = NodePath("Panel/Row/RegenerateButton")
