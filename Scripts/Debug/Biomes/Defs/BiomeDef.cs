@@ -14,5 +14,9 @@ namespace BiomeArchitectV2.Biomes.Defs
             Region = region;
             SelectionWeight = selectionWeight;
         }
+
+
+
+        public override string ToString() => Id;
     }
 }

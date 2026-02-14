@@ -4,8 +4,6 @@ using BiomeArchitectV2.Debug.Biomes;
 using BiomeArchitectV2.Debug.UI;
 using BiomeArchitectV2.Biomes.Generation;
 using BiomeArchitectV2.Biomes.Catalog;
-using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace BiomeArchitectV2
 {
@@ -42,49 +40,29 @@ namespace BiomeArchitectV2
             _renderer.Init(_config, WorldSeed, bands);
 
             var catalog = BiomeCatalog.CreateDefault();
-            var settings = RegionBiomeCountSettingsProvider.CreateDefaults();
-            var selectionRng = new System.Random(unchecked(seed * 92821 + 1337));
 
-            LogRegionSelections(catalog, settings, bands, selectionRng);
+            BiomeSelectionResult selectionResult = BiomeSelectionPipeline.Run(
+                catalog,
+                bands,
+                _config.BiomeChunksX,
+                WorldSeed
+            );
 
-            GD.Print($"[BiomeArchitectV2] Regenerated with Seed = {WorldSeed} | Terrain = {TerrainWidthTiles}px * {TerrainHeightTiles}px | " +
+            GD.Print($"[BiomeArchitectV2] Regenerated with Seed {WorldSeed} | Terrain = {TerrainWidthTiles}px * {TerrainHeightTiles}px | " +
                 $"Biome Chunks = {_config.BiomeChunksX} * {_config.BiomeChunksY}");
+            LogSelectionResult(selectionResult);
+            GD.Print("-----------------------------------------------------------");
         }
 
 
 
-        private void LogRegionSelections(
-            BiomeCatalog catalog,
-            IReadOnlyDictionary<RegionId, RegionBiomeCountSettings> settings,
-            RegionBands bands,
-            System.Random rng
-        )
+        private void LogSelectionResult(BiomeSelectionResult result)
         {
-            LogRegion(RegionId.Sky, bands.SkyHeightChunks);
-            LogRegion(RegionId.Surface, bands.SurfaceHeightChunks);
-            LogRegion(RegionId.Underground, bands.UndergroundHeightChunks);
-
-            void LogRegion(RegionId region, int bandHeight)
+            foreach (var region in result.Regions)
             {
-                int regionArea = _config.BiomeChunksX * bandHeight;
-
-                int target = settings[region].GetTargetCount(
-                    chunksX: _config.BiomeChunksX,
-                    bandHeightChunks: bandHeight,
-                    regionAreaChunks: regionArea,
-                    rng: rng
-                );
-
-                var picked = BiomeSelection.SelectForRegion(
-                    catalog: catalog,
-                    region: region,
-                    targetCount: target,
-                    rng: rng
-                );
-
-                GD.Print($"[BiomeArchitectV2] {region, -11} | Band = {bandHeight, 2} | Area = {regionArea, 4} | " + 
-                    $"Target = {target, 2} | Selected = {picked.Count, 2} => " +
-                    string.Join(", ", picked.ConvertAll(b => b.Id)));
+                GD.Print($"[BiomeArchitectV2] {region.Region, -11} | Bands = {region.BandHeight, 2} | Area = {region.Area, 4} | Target = {region.TargetCount, 2} | " +
+                        $"Selected = {region.SelectedBiomes.Count, 2} => " +
+                        string.Join(", ", region.SelectedBiomes));
             }
         }
     }

@@ -43,8 +43,8 @@ namespace BiomeArchitectV2.Biomes.Generation
             count += rng.Next(-1, 2);
             count = Math.Clamp(count, MinCount, MaxCount);
             int maxByArea = Math.Max(1, regionAreaChunks / Math.Max(1, MinAreaPerBiomeChunks));
-            count = Math.Max(1, maxByArea);
-            return Math.Min(1, count);
+            count = Math.Min(count, maxByArea);
+            return Math.Max(1, count);
         }
 
 
