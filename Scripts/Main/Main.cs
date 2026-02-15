@@ -1,12 +1,16 @@
 using Godot;
 using BiomeArchitectV2.Core;
 using BiomeArchitectV2.Debug.Biomes;
+using BiomeArchitectV2.Debug.Terrain;
 using BiomeArchitectV2.Biomes.Catalog;
 using BiomeArchitectV2.Biomes.Generation;
 using BiomeArchitectV2.Biomes.Growth;
 using BiomeArchitectV2.Biomes.Maps;
 using BiomeArchitectV2.Biomes.Seeding;
 using BiomeArchitectV2.UI;
+using System.Linq;
+using System.Collections.Generic;
+using System;
 
 namespace BiomeArchitectV2
 {
@@ -16,11 +20,11 @@ namespace BiomeArchitectV2
         [Export] public int TerrainHeightTiles { get; set; } = 1024;
         [Export] public int WorldSeed { get; set; } = 12345;
 
-        [Export] private BiomeChunkDebugRenderer _renderer = null!;
+        [Export] private BiomeChunkDebugRenderer _biomeRenderer = null!;
         [Export] private SeedControllerUI _seedUi = null!;
+        [Export] private TerrainStubDebugRenderer _terrainRenderer = null!;
 
         private WorldConfig _config = null!;
-        public BiomeChunkMap BiomeMap { get; private set; } = null!;
 
 
 
@@ -46,15 +50,16 @@ namespace BiomeArchitectV2
             BiomeSelectionResult selectionResult = BiomeSelectionPipeline.Run(catalog, bands, _config.BiomeChunksX, WorldSeed);
             BiomeSeedResult seedResult = BiomeSeeder.Run(selectionResult, bands, _config.BiomeChunksX, WorldSeed);
             BiomeChunkGrowthResult growthResult = BiomeChunkGrower.Run(_config, bands, seedResult);
-            
-            BiomeMap = new BiomeChunkMap(_config, bands, growthResult);
+            BiomeChunkMap biomeMap = new BiomeChunkMap(_config, bands, growthResult);
 
-            _renderer.Init(_config, WorldSeed, bands, growthResult);
+            _terrainRenderer.Init(_config, WorldSeed, biomeMap);
+            _biomeRenderer.Init(_config, WorldSeed, bands, growthResult);
 
             LogTerrainResult();
             LogSelectionResult(selectionResult);
             LogSeedResult(seedResult);
             LogGrowthResult(growthResult);
+            LogTerrainStubProfiles(biomeMap);
 
             GD.Print("[BiomeArchitectV2] -----------------------------------------------------------");
         }
@@ -113,36 +118,108 @@ namespace BiomeArchitectV2
 
                     RegionId region = result.Biomes[owner].Region;
 
-                    switch (region)
-                    {
-                        case RegionId.Sky:
-                            skyTotal++;
-                            break;
-                        case RegionId.Surface:
-                            surfaceTotal++;
-                            break;
-                        case RegionId.Underground:
-                            undergroundTotal++;
-                            break;
-                        default:
-                            break;
-                    }
+                    if (region == RegionId.Sky)
+                        skyTotal++;
+                    else if (region == RegionId.Surface)
+                        surfaceTotal++;
+                    else if (region == RegionId.Underground)
+                        undergroundTotal++;
                 }
             }
 
             for (int i = 0; i < result.Biomes.Count; i++)
             {
-                GD.Print($"[BiomeArchitectV2] Growth | {result.Biomes[i].Id, -28} => {counts[i]} chunks");
+                int regionCount = result.Biomes[i].Region switch
+                {
+                    RegionId.Sky => regionCount = skyTotal,
+                    RegionId.Surface => regionCount = surfaceTotal,
+                    _ => regionCount = undergroundTotal
+                };
+                GD.Print($"[BiomeArchitectV2] Growth | {result.Biomes[i].Id, -28} => {counts[i], 3} chunks" +
+                    $" | {GetOwnershipPercentage(counts[i], regionCount), 3}% {result.Biomes[i].Region} Ownership");
             }
-            GD.Print("[BiomeArchitectV2] ---------- REGION TOTALS ----------");
-            GD.Print($"[BiomeArchitectV2] Sky         => {skyTotal} chunks");
-            GD.Print($"[BiomeArchitectV2] Surface     => {surfaceTotal} chunks");
-            GD.Print($"[BiomeArchitectV2] Underground => {undergroundTotal} chunks");
 
             int totalClaimed = skyTotal + surfaceTotal + undergroundTotal;
             int expectedTotal = result.ChunksX * result.ChunksY;
 
-            GD.Print($"[BiomeArchitectV2] TOTAL CLAIMED = {totalClaimed}/{expectedTotal}");
+            GD.Print("[BiomeArchitectV2] ---------- REGION TOTALS ----------");
+            GD.Print($"[BiomeArchitectV2] Sky           => {skyTotal, 4} chunks | {GetOwnershipPercentage(skyTotal, expectedTotal), 3}% Map Ownership");
+            GD.Print($"[BiomeArchitectV2] Surface       => {surfaceTotal, 4} chunks | {GetOwnershipPercentage(surfaceTotal, expectedTotal), 3}% Map Ownership");
+            GD.Print($"[BiomeArchitectV2] Underground   => {undergroundTotal, 4} chunks | {GetOwnershipPercentage(undergroundTotal, expectedTotal), 3}% Map Ownership");
+            GD.Print($"[BiomeArchitectV2] TOTAL CLAIMED => {totalClaimed}/{expectedTotal}");
+        }
+
+
+
+        private int GetOwnershipPercentage(int chunks, int total)
+        {
+            return chunks * 100 / total;
+        }
+
+
+
+        private void LogTerrainStubProfiles(BiomeChunkMap map)
+        {
+            GD.Print("[BiomeArchitectV2] ===================== TERRAIN STUB PROFILES =====================");
+
+            var counts = new Dictionary<string, int>();
+
+            for (int cx = 0; cx < map.ChunksX; cx++)
+            {
+                for (int cy = 0; cy < map.ChunksY; cy++)
+                {
+                    var biome = map.GetBiomeAtChunk(cx, cy);
+                    if (biome == null) continue;
+
+                    if (!counts.ContainsKey(biome.Id))
+                        counts[biome.Id] = 0;
+
+                    counts[biome.Id]++;
+                }
+            }
+
+            foreach (var kvp in counts.OrderByDescending(k => k.Value))
+            {
+                string profile = GetTerrainProfileForBiome(kvp.Key);
+
+                GD.Print($"[BiomeArchitectV2] Terrain | {kvp.Key,-28} | Chunks = {kvp.Value,3} | Profile = {profile}");
+            }
+        }
+
+
+
+        private string GetTerrainProfileForBiome(string biomeId)
+        {
+            string id = biomeId.ToLowerInvariant();
+
+            if (id.Contains("lava") || id.Contains("volcan") || id.Contains("cinder"))
+                return "High Lava / Basalt / Rare Ore";
+
+            if (id.Contains("crystal") || id.Contains("geode") || id.Contains("quartz"))
+                return "Crystal-Rich / Medium Ore";
+
+            if (id.Contains("forest") || id.Contains("meadow") || id.Contains("prairie"))
+                return "High Organic / Timber / Light Ore";
+
+            if (id.Contains("desert") || id.Contains("sand") || id.Contains("badlands"))
+                return "Sand / Salt / Sparse Ore";
+
+            if (id.Contains("swamp") || id.Contains("river") || id.Contains("ocean"))
+                return "Water-Heavy / Clay / Organic";
+
+            if (id.Contains("tundra") || id.Contains("glacial") || id.Contains("ice"))
+                return "Ice / Low Organic / Medium Ore";
+
+            if (id.Contains("oasis"))
+                return "Water-Heavy / Clay / Organic";
+
+            if (id.Contains("mushroom") || id.Contains("glowworm") || id.Contains("biolum"))
+                return "Glow / Organic / Water";
+
+            if (id.Contains("thermal") || id.Contains("spring"))
+                return "Water-Heavy / Minerals / Heat";
+
+            return "Mixed Generic Resources";
         }
     }
 }
