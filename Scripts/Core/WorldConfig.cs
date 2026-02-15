@@ -11,6 +11,7 @@ namespace BiomeArchitectV2.Core
         public int BiomeChunksX => TerrainWidthTiles / BIOME_CHUNK_SIZE_TILES;
         public int BiomeChunksY => TerrainHeightTiles / BIOME_CHUNK_SIZE_TILES;
         public int BiomeChunkWorldSizePx => BIOME_CHUNK_SIZE_TILES * TERRAIN_TILE_SIZE_PX;
+        public bool WrapX { get; }
 
 
 
@@ -24,6 +25,7 @@ namespace BiomeArchitectV2.Core
 
             TerrainWidthTiles = terrainWidthTiles;
             TerrainHeightTiles = terrainHeightTiles;
+            WrapX = false;
         }
     }
 }

@@ -5,6 +5,7 @@ using BiomeArchitectV2.Biomes.Catalog;
 using BiomeArchitectV2.Biomes.Generation;
 using BiomeArchitectV2.Biomes.Seeding;
 using BiomeArchitectV2.UI;
+using BiomeArchitectV2.Biomes.Growth;
 
 namespace BiomeArchitectV2
 {
@@ -44,18 +45,21 @@ namespace BiomeArchitectV2
 
             BiomeSelectionResult selectionResult = BiomeSelectionPipeline.Run(catalog, bands, _config.BiomeChunksX, WorldSeed);
             BiomeSeedResult seedResult = BiomeSeeder.Run(selectionResult, bands, _config.BiomeChunksX, WorldSeed);
+            BiomeChunkGrowthResult growthResult = BiomeChunkGrower.Run(_config, bands, seedResult);
 
             LogTerrainResult();
             LogSelectionResult(selectionResult);
             LogSeedResult(seedResult);
+            LogGrowthResult(growthResult);
 
-            GD.Print("-----------------------------------------------------------");
+            GD.Print("[BiomeArchitectV2] -----------------------------------------------------------");
         }
 
 
 
         private void LogTerrainResult()
         {
+            GD.Print("[BiomeArchitectV2] ===================== MAP SIZE RESULTS =====================");
             GD.Print($"[BiomeArchitectV2] Regenerated with Seed {WorldSeed, 12} | Terrain = {TerrainWidthTiles} Tiles * {TerrainHeightTiles} Tiles | " +
                 $"Biome Chunks = {_config.BiomeChunksX} * {_config.BiomeChunksY}");
         }
@@ -64,6 +68,7 @@ namespace BiomeArchitectV2
 
         private void LogSelectionResult(BiomeSelectionResult result)
         {
+            GD.Print("[BiomeArchitectV2] ===================== BIOME SELECTION RESULTS =====================");
             foreach (var region in result.Regions)
             {
                 GD.Print($"[BiomeArchitectV2] {region.Region, -11} | Bands = {region.BandHeight, 2} | Area = {region.Area, 4} | Target = {region.TargetCount, 2} | " +
@@ -75,10 +80,65 @@ namespace BiomeArchitectV2
 
         private void LogSeedResult(BiomeSeedResult result)
         {
+            GD.Print("[BiomeArchitectV2] ===================== BIOME SEED RESULTS =====================");
             foreach (var s in result.Seeds)
             {
                 GD.Print($"[BiomeArchitectV2] Seed | {s.Region,-11} | {s.Biome.Id, -20} @ ({s.ChunkCoord.X},{s.ChunkCoord.Y})");
             }
+        }
+
+
+
+        private void LogGrowthResult(BiomeChunkGrowthResult result)
+        {
+            GD.Print("[BiomeArchitectV2] ===================== BIOME GROWTH RESULTS =====================");
+            var counts = new int[result.Biomes.Count];
+            int skyTotal = 0;
+            int surfaceTotal = 0;
+            int undergroundTotal = 0;
+
+            for (int x = 0; x < result.ChunksX; x++)
+            {
+                for (int y = 0; y < result.ChunksY; y++)
+                {
+                    int owner = result.Owners[x, y];
+                    if (owner < 0 || owner >= counts.Length)
+                        continue;
+
+                    counts[owner]++;
+
+                    RegionId region = result.Biomes[owner].Region;
+
+                    switch (region)
+                    {
+                        case RegionId.Sky:
+                            skyTotal++;
+                            break;
+                        case RegionId.Surface:
+                            surfaceTotal++;
+                            break;
+                        case RegionId.Underground:
+                            undergroundTotal++;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            for (int i = 0; i < result.Biomes.Count; i++)
+            {
+                GD.Print($"[BiomeArchitectV2] Growth | {result.Biomes[i].Id, -28} => {counts[i]} chunks");
+            }
+            GD.Print("[BiomeArchitectV2] ---------- REGION TOTALS ----------");
+            GD.Print($"[BiomeArchitectV2] Sky         => {skyTotal} chunks");
+            GD.Print($"[BiomeArchitectV2] Surface     => {surfaceTotal} chunks");
+            GD.Print($"[BiomeArchitectV2] Underground => {undergroundTotal} chunks");
+
+            int totalClaimed = skyTotal + surfaceTotal + undergroundTotal;
+            int expectedTotal = result.ChunksX * result.ChunksY;
+
+            GD.Print($"[BiomeArchitectV2] TOTAL CLAIMED = {totalClaimed}/{expectedTotal}");
         }
     }
 }
