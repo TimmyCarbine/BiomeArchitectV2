@@ -4,6 +4,7 @@ using BiomeArchitectV2.Debug.Biomes;
 using BiomeArchitectV2.Biomes.Catalog;
 using BiomeArchitectV2.Biomes.Generation;
 using BiomeArchitectV2.Biomes.Growth;
+using BiomeArchitectV2.Biomes.Maps;
 using BiomeArchitectV2.Biomes.Seeding;
 using BiomeArchitectV2.UI;
 
@@ -19,6 +20,7 @@ namespace BiomeArchitectV2
         [Export] private SeedControllerUI _seedUi = null!;
 
         private WorldConfig _config = null!;
+        public BiomeChunkMap BiomeMap { get; private set; } = null!;
 
 
 
@@ -39,13 +41,15 @@ namespace BiomeArchitectV2
 
             RegionBands bands = RegionBands.Generate(_config, WorldSeed);
 
-            _renderer.Init(_config, WorldSeed, bands);
-
             var catalog = BiomeCatalog.CreateDefault();
 
             BiomeSelectionResult selectionResult = BiomeSelectionPipeline.Run(catalog, bands, _config.BiomeChunksX, WorldSeed);
             BiomeSeedResult seedResult = BiomeSeeder.Run(selectionResult, bands, _config.BiomeChunksX, WorldSeed);
             BiomeChunkGrowthResult growthResult = BiomeChunkGrower.Run(_config, bands, seedResult);
+            
+            BiomeMap = new BiomeChunkMap(_config, bands, growthResult);
+
+            _renderer.Init(_config, WorldSeed, bands, growthResult);
 
             LogTerrainResult();
             LogSelectionResult(selectionResult);

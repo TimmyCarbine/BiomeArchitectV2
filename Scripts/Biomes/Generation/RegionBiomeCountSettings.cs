@@ -1,5 +1,4 @@
 using System;
-using BiomeArchitectV2.Biomes.Generation;
 using Godot;
 
 namespace BiomeArchitectV2.Biomes.Generation

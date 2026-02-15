@@ -5,7 +5,6 @@ using BiomeArchitectV2.Biomes.Defs;
 using BiomeArchitectV2.Biomes.Generation;
 using BiomeArchitectV2.Biomes.Seeding;
 using BiomeArchitectV2.Core;
-using System.Text;
 
 namespace BiomeArchitectV2.Biomes.Growth
 {
