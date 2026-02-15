@@ -59,38 +59,107 @@ namespace BiomeArchitectV2.Biomes.Catalog
         {
             var defs = new[]
             {
-                new BiomeDef("Sky Meadow", RegionId.Sky, 40),
-                new BiomeDef("Cloud Forest", RegionId.Sky, 30),
-                new BiomeDef("Thunderstorm Fields", RegionId.Sky, 20),
-                new BiomeDef("Rainbow Archipelago", RegionId.Sky, 15),
-                new BiomeDef("Astral Plane", RegionId.Sky, 10),
+                // ====== SKY ====== preferredVertical01: 0 = top of band, 1 = bottom of  band
+                // Common
+                new BiomeDef("Sky Meadow",              RegionId.Sky, selectionWeight: 72, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Cloud Forest",            RegionId.Sky, selectionWeight: 66, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Wind-Carved Mists",       RegionId.Sky, selectionWeight: 60, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
 
-                // --- Surface Biomes ---
-                new BiomeDef("Prairie", RegionId.Surface, 45),
-                new BiomeDef("Temperate Forest", RegionId.Surface, 40),
-                new BiomeDef("Sandy Desert", RegionId.Surface, 25),
-                new BiomeDef("Rolling Tundra", RegionId.Surface, 20),
-                new BiomeDef("Coral Reef", RegionId.Surface, 10),
-                new BiomeDef("Oasis", RegionId.Surface, 15),
-                new BiomeDef("Coniferious Forest", RegionId.Surface, 30),
-                new BiomeDef("Meadow", RegionId.Surface, 35),
-                new BiomeDef("Glacial Plains", RegionId.Surface, 15),
-                new BiomeDef("Plasma Fields", RegionId.Surface, 8),
+                // Uncommon 
+                new BiomeDef("Thunderstorm Fields",     RegionId.Sky, selectionWeight: 58, preferredVertical01: 0.45f, verticalBiasStrength01: 0.45f), // biased
+                new BiomeDef("Cumulus Highlands",       RegionId.Sky, selectionWeight: 52, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Sunshower Glades",        RegionId.Sky, selectionWeight: 48, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Twilight Cloudbanks",     RegionId.Sky, selectionWeight: 42, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
 
-                // --- Underground Biomes ---
-                new BiomeDef("Crystal Caverns", RegionId.Underground, 25),
-                new BiomeDef("Mushroom Caves", RegionId.Underground, 25),
-                new BiomeDef("Frozen Tundra", RegionId.Underground, 20),
-                new BiomeDef("Subterrainean Swamp", RegionId.Underground, 20),
-                new BiomeDef("Toxic Caverns", RegionId.Underground, 12),
-                new BiomeDef("Lava Tubes", RegionId.Underground, 10),
-                new BiomeDef("Abyssal Forest", RegionId.Underground, 10),
-                new BiomeDef("Aether Tunnels", RegionId.Underground, 10),
-                new BiomeDef("Sulphur Pits", RegionId.Underground, 12),
-                new BiomeDef("Underground Ocean", RegionId.Underground, 8),
-                new BiomeDef("Subterrainean River", RegionId.Underground, 18),
-                new BiomeDef("Dark Desert", RegionId.Underground, 12),
+                // Rare
+                new BiomeDef("Gale Blossom Fields",     RegionId.Sky, selectionWeight: 36, preferredVertical01: 0.60f, verticalBiasStrength01: 0.35f), // biased
+                new BiomeDef("Hailstone Front",         RegionId.Sky, selectionWeight: 34, preferredVertical01: 0.40f, verticalBiasStrength01: 0.50f), // biased
+                new BiomeDef("Ice Crystal Drift",       RegionId.Sky, selectionWeight: 28, preferredVertical01: 0.25f, verticalBiasStrength01: 0.55f), // biased
+                new BiomeDef("Sunlit Stratus",          RegionId.Sky, selectionWeight: 26, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Sky Mangroves",           RegionId.Sky, selectionWeight: 22, preferredVertical01: 0.75f, verticalBiasStrength01: 0.45f), // biased
+
+                // Very Rare
+                new BiomeDef("Floating Kelp Canopy",    RegionId.Sky, selectionWeight: 18, preferredVertical01: 0.85f, verticalBiasStrength01: 0.50f), // biased
+                new BiomeDef("Cirrus Spires",           RegionId.Sky, selectionWeight: 14, preferredVertical01: 0.15f, verticalBiasStrength01: 0.65f), // biased
+                new BiomeDef("Lightning Reef",          RegionId.Sky, selectionWeight: 12, preferredVertical01: 0.50f, verticalBiasStrength01: 0.55f), // biased
+
+                // Super Rare
+                new BiomeDef("Moonlit Cirque",          RegionId.Sky, selectionWeight: 10, preferredVertical01: 0.15f, verticalBiasStrength01: 0.60f), // biased
+                new BiomeDef("Stormglass Halo",         RegionId.Sky, selectionWeight:  8, preferredVertical01: 0f,    verticalBiasStrength01: 0f),    // biased
+                new BiomeDef("Aurora Veil",             RegionId.Sky, selectionWeight:  6, preferredVertical01: 0.05f, verticalBiasStrength01: 0.80f), // biased
+
+                // Extremely Rare
+                new BiomeDef("Astral Plane",            RegionId.Sky, selectionWeight:  4, preferredVertical01: 0.10f, verticalBiasStrength01: 0.85f), // biased
+                new BiomeDef("Rainbow Archipelago",     RegionId.Sky, selectionWeight:  2, preferredVertical01: 0.35f, verticalBiasStrength01: 0.35f), // biased
+                
+
+                // ====== SURFACE ====== preferredVertical01: 0 = top of band, 1 = bottom of  band
+                // Common
+                new BiomeDef("Prairie",                 RegionId.Surface, selectionWeight: 78, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Temperate Forest",        RegionId.Surface, selectionWeight: 74, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Meadow",                  RegionId.Surface, selectionWeight: 70, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Coniferious Forest",      RegionId.Surface, selectionWeight: 64, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+
+                // Uncommon
+                new BiomeDef("Savanna",                 RegionId.Surface, selectionWeight: 56, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Sandy Desert",            RegionId.Surface, selectionWeight: 52, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Rolling Tundra",          RegionId.Surface, selectionWeight: 44, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Karst Badlands",          RegionId.Surface, selectionWeight: 40, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+
+                // Rare
+                new BiomeDef("Oasis",                   RegionId.Surface, selectionWeight: 34, preferredVertical01: 0.70f, verticalBiasStrength01: 0.40f), // biased
+                new BiomeDef("Glacial Plains",          RegionId.Surface, selectionWeight: 26, preferredVertical01: 0.20f, verticalBiasStrength01: 0.60f), // biased
+                new BiomeDef("Salt Flats",              RegionId.Surface, selectionWeight: 22, preferredVertical01: 0.80f, verticalBiasStrength01: 0.40f), // biased
+
+                // Very Rare
+                new BiomeDef("Mangrove Delta",          RegionId.Surface, selectionWeight: 18, preferredVertical01: 0.85f, verticalBiasStrength01: 0.55f), // biased
+                new BiomeDef("Volcanic Highlands",      RegionId.Surface, selectionWeight: 16, preferredVertical01: 0.25f, verticalBiasStrength01: 0.60f), // biased
+
+                // Super Rare
+                new BiomeDef("Coral Reef",              RegionId.Surface, selectionWeight:  8, preferredVertical01: 0.95f, verticalBiasStrength01: 0.75f), // biased
+
+                // Extrememly Rare
+                new BiomeDef("Plasma Fields",           RegionId.Surface, selectionWeight:  4, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+
+                // ====== UNDERGROUND ====== preferredVertical01: 0 = top of band, 1 = bottom of  band
+                // Common
+                new BiomeDef("Geode Grotto",            RegionId.Underground, selectionWeight: 75, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Ironstone Warrens",       RegionId.Underground, selectionWeight: 70, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Crystal Caverns",         RegionId.Underground, selectionWeight: 68, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Mushroom Caves",          RegionId.Underground, selectionWeight: 62, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Subterrainean River",     RegionId.Underground, selectionWeight: 60, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+
+                // Uncommon
+                new BiomeDef("Dripstone Cathedral",     RegionId.Underground, selectionWeight: 48, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Basalt Column Caves",     RegionId.Underground, selectionWeight: 44, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Quartz Vein Hollows",     RegionId.Underground, selectionWeight: 46, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Glowworm Grottos",        RegionId.Underground, selectionWeight: 42, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+
+                // Rare
+                new BiomeDef("Frozen Tundra",           RegionId.Underground, selectionWeight: 34, preferredVertical01: 0.20f, verticalBiasStrength01: 0.55f), // biased
+                new BiomeDef("Lava Tubes",              RegionId.Underground, selectionWeight: 30, preferredVertical01: 0.30f, verticalBiasStrength01: 0.60f), // biased
+                new BiomeDef("Sulphur Pits",            RegionId.Underground, selectionWeight: 28, preferredVertical01: 0.65f, verticalBiasStrength01: 0.55f), // biased
+                new BiomeDef("Toxic Caverns",           RegionId.Underground, selectionWeight: 26, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Dark Desert",             RegionId.Underground, selectionWeight: 24, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Fossil Beds",             RegionId.Underground, selectionWeight: 22, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+                new BiomeDef("Ancient Root Hollows",    RegionId.Underground, selectionWeight: 20, preferredVertical01: 0f,    verticalBiasStrength01: 0f),
+
+                // Very rare
+                new BiomeDef("Underground Ocean",       RegionId.Underground, selectionWeight: 18, preferredVertical01: 0.95f, verticalBiasStrength01: 0.80f), // biased
+                new BiomeDef("Thermal Spring Caverns",  RegionId.Underground, selectionWeight: 18, preferredVertical01: 0.55f, verticalBiasStrength01: 0.55f), // biased
+                new BiomeDef("Obsidian Hollows",        RegionId.Underground, selectionWeight: 16, preferredVertical01: 0.75f, verticalBiasStrength01: 0.55f), // biased
+                new BiomeDef("Subterrainean Swamp",     RegionId.Underground, selectionWeight: 14, preferredVertical01: 0.70f, verticalBiasStrength01: 0.45f), // biased
+                new BiomeDef("Blackwater Sinkholes",    RegionId.Underground, selectionWeight: 12, preferredVertical01: 0.85f, verticalBiasStrength01: 0.60f), // biased
+
+                // Super rare
+                new BiomeDef("Bioluminescent Lake",     RegionId.Underground, selectionWeight: 10, preferredVertical01: 0.80f, verticalBiasStrength01: 0.65f), // biased
+                new BiomeDef("Abyssal Forest",          RegionId.Underground, selectionWeight:  6, preferredVertical01: 0.90f, verticalBiasStrength01: 0.80f), // biased
+
+                // Extrememly Rare
+                new BiomeDef("Aether Tunnels",          RegionId.Underground, selectionWeight:  5, preferredVertical01: 0.50f, verticalBiasStrength01: 0.60f), // biased
+                new BiomeDef("Ashen Cinder Caves",      RegionId.Underground, selectionWeight:  4, preferredVertical01: 0.75f, verticalBiasStrength01: 0.70f), // biased
             };
+
             return new BiomeCatalog(defs);
         }
     }

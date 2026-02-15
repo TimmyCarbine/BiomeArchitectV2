@@ -3,9 +3,9 @@ using BiomeArchitectV2.Core;
 using BiomeArchitectV2.Debug.Biomes;
 using BiomeArchitectV2.Biomes.Catalog;
 using BiomeArchitectV2.Biomes.Generation;
+using BiomeArchitectV2.Biomes.Growth;
 using BiomeArchitectV2.Biomes.Seeding;
 using BiomeArchitectV2.UI;
-using BiomeArchitectV2.Biomes.Growth;
 
 namespace BiomeArchitectV2
 {
