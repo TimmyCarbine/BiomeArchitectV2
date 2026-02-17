@@ -6,12 +6,12 @@ using BiomeArchitectV2.Biomes.Catalog;
 using BiomeArchitectV2.Biomes.Generation;
 using BiomeArchitectV2.Biomes.Growth;
 using BiomeArchitectV2.Biomes.Maps;
+using BiomeArchitectV2.Player;
 using BiomeArchitectV2.Biomes.Seeding;
 using BiomeArchitectV2.Terrain.Streaming;
 using BiomeArchitectV2.UI;
 using System.Linq;
 using System.Collections.Generic;
-using System.Numerics;
 
 namespace BiomeArchitectV2
 {
@@ -25,6 +25,7 @@ namespace BiomeArchitectV2
         [Export] private SeedControllerUI _seedUi = null!;
         [Export] private TerrainStubDebugRenderer _terrainRenderer = null!;
         [Export] private TerrainChunkStreamer _terrainStreamer = null!;
+        [Export] private PlayerController _player = null!;
 
         private WorldConfig _config = null!;
 
@@ -36,7 +37,9 @@ namespace BiomeArchitectV2
 
             _seedUi.Init(this, WorldSeed);
 
-            RegenerateWithSeed(WorldSeed);            
+            RegenerateWithSeed(WorldSeed);   
+
+            _player.GlobalPosition = new Vector2(200, 0);         
         }
 
 

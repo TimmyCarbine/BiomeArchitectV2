@@ -1,6 +1,6 @@
 using Godot;
 
-namespace BiomeArchitectV2.Debug.FreeCam
+namespace BiomeArchitectV2.Debug.Camera
 {
     public sealed partial class FreeCamCamera2D : Camera2D
     {
@@ -18,6 +18,8 @@ namespace BiomeArchitectV2.Debug.FreeCam
         private Vector2 _dragStartMouseScreen;
         private Vector2 _dragStartCameraPos;
 
+        public bool ControlEnabled { get; set; } = true;
+
 
 
 
@@ -31,6 +33,9 @@ namespace BiomeArchitectV2.Debug.FreeCam
 
         public override void _Process(double delta)
         {
+            if (!ControlEnabled)
+                return;
+            
             Vector2 dir = Vector2.Zero;
 
             if (Input.IsActionPressed("freecam_left")) dir.X -= 1f;
