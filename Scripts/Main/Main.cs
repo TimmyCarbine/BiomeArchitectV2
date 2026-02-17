@@ -7,10 +7,11 @@ using BiomeArchitectV2.Biomes.Generation;
 using BiomeArchitectV2.Biomes.Growth;
 using BiomeArchitectV2.Biomes.Maps;
 using BiomeArchitectV2.Biomes.Seeding;
+using BiomeArchitectV2.Terrain.Streaming;
 using BiomeArchitectV2.UI;
 using System.Linq;
 using System.Collections.Generic;
-using System;
+using System.Numerics;
 
 namespace BiomeArchitectV2
 {
@@ -23,6 +24,7 @@ namespace BiomeArchitectV2
         [Export] private BiomeChunkDebugRenderer _biomeRenderer = null!;
         [Export] private SeedControllerUI _seedUi = null!;
         [Export] private TerrainStubDebugRenderer _terrainRenderer = null!;
+        [Export] private TerrainChunkStreamer _terrainStreamer = null!;
 
         private WorldConfig _config = null!;
 
@@ -54,6 +56,7 @@ namespace BiomeArchitectV2
 
             _terrainRenderer.Init(_config, WorldSeed, biomeMap);
             _biomeRenderer.Init(_config, WorldSeed, bands, growthResult);
+            _terrainStreamer.Init(_config, WorldSeed, biomeMap);
 
             LogTerrainResult();
             LogSelectionResult(selectionResult);

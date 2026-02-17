@@ -1,16 +1,21 @@
-[gd_scene load_steps=6 format=3 uid="uid://c3rt81sglhq7j"]
+[gd_scene load_steps=8 format=3 uid="uid://c3rt81sglhq7j"]
 
 [ext_resource type="Script" uid="uid://c4u4dj3t2tsn7" path="res://Scripts/Main/Main.cs" id="1_r150o"]
 [ext_resource type="Script" uid="uid://bjcdqtirtderj" path="res://Scripts/Debug/FreeCam/FreeCamCamera2D.cs" id="2_idj7w"]
 [ext_resource type="Script" uid="uid://dfn0csysmgrik" path="res://Scripts/Debug/Biomes/BiomeChunkDebugRenderer.cs" id="2_rgh2o"]
 [ext_resource type="Script" uid="uid://cet00n7yuhnv2" path="res://Scripts/Debug/Terrain/TerrainStubDebugRenderer.cs" id="3_pbw6q"]
+[ext_resource type="TileSet" uid="uid://d4nh5qh11d8dj" path="res://Assets/TileSets/TerrainTileSet.tres" id="4_jw32o"]
 [ext_resource type="Script" uid="uid://cc5woforrv1sr" path="res://Scripts/UI/SeedControllerUI.cs" id="4_rgh2o"]
+[ext_resource type="Script" uid="uid://dbiepai3vf1j7" path="res://Scripts/Terrain/BiomeEdges/Streaming/TerrainChunkStreamer.cs" id="5_50glp"]
 
-[node name="Main" type="Node2D" node_paths=PackedStringArray("_biomeRenderer", "_seedUi", "_terrainRenderer")]
+[node name="Main" type="Node2D" node_paths=PackedStringArray("_biomeRenderer", "_seedUi", "_terrainRenderer", "_terrainStreamer")]
 script = ExtResource("1_r150o")
+TerrainWidthTiles = 4096
+TerrainHeightTiles = 2048
 _biomeRenderer = NodePath("WorldRoot/BiomeChunkDebugRenderer")
 _seedUi = NodePath("DebugUI")
 _terrainRenderer = NodePath("WorldRoot/TerrainStubDebugRenderer")
+_terrainStreamer = NodePath("WorldRoot/TerrainChunkStreamer")
 
 [node name="WorldRoot" type="Node2D" parent="."]
 
@@ -19,6 +24,15 @@ script = ExtResource("2_rgh2o")
 
 [node name="TerrainStubDebugRenderer" type="Node2D" parent="WorldRoot"]
 script = ExtResource("3_pbw6q")
+Enabled = false
+
+[node name="TerrainLayer" type="TileMapLayer" parent="WorldRoot"]
+tile_set = ExtResource("4_jw32o")
+
+[node name="TerrainChunkStreamer" type="Node2D" parent="WorldRoot" node_paths=PackedStringArray("_terrainLayer", "_followTarget")]
+script = ExtResource("5_50glp")
+_terrainLayer = NodePath("../TerrainLayer")
+_followTarget = NodePath("../Camera2D")
 
 [node name="Camera2D" type="Camera2D" parent="WorldRoot"]
 zoom = Vector2(0.25, 0.25)
