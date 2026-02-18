@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Godot;
 using BiomeArchitectV2.Core;
 using BiomeArchitectV2.Biomes.Maps;
+using BiomeArchitectV2.Biomes.Generation;
 
 namespace BiomeArchitectV2.Terrain.Streaming
 {
@@ -17,6 +18,19 @@ namespace BiomeArchitectV2.Terrain.Streaming
         [Export] public int GroundSourceId { get; set; } = 0;
         [Export] public Vector2I GroundAtlasCoords { get; set; } = new(1, 0);
         [Export] public int GroundAlternative { get; set; } = 0;
+
+        [Export] public int SkySourceId { get; set; } = 0;
+        [Export] public Vector2I SkyAtlasCoords { get; set; } = new(0, 0);
+        [Export] public int SurfaceSourceId { get; set; } = 0;
+        [Export] public Vector2I SurfaceAtlasCoords { get; set; } = new(1, 0);
+        [Export] public int UndergroundSourceId { get; set; } = 0;
+        [Export] public Vector2I UndergroundAtlasCoords { get; set; } = new(2, 0);
+
+        // Optional biome-specific overrides (simple keyword-based for now)
+        [Export] public int LavaSourceId { get; set; } = 0;
+        [Export] public Vector2I LavaAtlasCoords { get; set; } = new(3, 0);
+        [Export] public int CrystalSourceId { get; set; } = 0;
+        [Export] public Vector2I CrystalAtlasCoords { get; set; } = new(0, 0);
 
         private WorldConfig _config = null!;
         private BiomeChunkMap _biomeMap = null!;
@@ -136,11 +150,13 @@ namespace BiomeArchitectV2.Terrain.Streaming
                         continue;
                     }
 
+                    GetGroundTileFor(tx, ty, out int src, out Vector2I atlas, out int alt);
+
                     _terrainLayer.SetCell(
                         new Vector2I(tx, ty),
-                        GroundSourceId,
-                        GroundAtlasCoords,
-                        GroundAlternative
+                        src,
+                        atlas,
+                        alt
                     );
                 }
             }
@@ -268,6 +284,92 @@ namespace BiomeArchitectV2.Terrain.Streaming
         {
             int r = x % m;
             return r < 0 ? r + m : r;
+        }
+
+
+
+        private int GetBiomeChunkXFromTerrainTileX(int terrainTileX)
+        {
+            int worldX = terrainTileX * _tileSizePx.X;
+            int cx = worldX / _config.BiomeChunkWorldSizePx;
+
+            if (_config.WrapX)
+                cx = Mod(cx, _biomeMap.ChunksX);
+
+            return cx;
+        }
+
+
+
+        private int GetBiomeChunkYFromTerrainTileY(int terrainTileY)
+        {
+            int worldY = terrainTileY * _tileSizePx.Y;
+            int cy = worldY / _config.BiomeChunkWorldSizePx;
+            return Mathf.Clamp(cy, 0, _biomeMap.ChunksY - 1);
+        }
+
+
+
+        private string GetBiomeIdAtTerrainTile(int terrainTileX, int terrainTileY)
+        {
+            int bcx = GetBiomeChunkXFromTerrainTileX(_config.WrapX ? Mod(terrainTileX, _config.TerrainWidthTiles) : terrainTileX);
+            int bcy = GetBiomeChunkYFromTerrainTileY(terrainTileY);
+
+            var biome = _biomeMap.GetBiomeAtChunk(bcx, bcy);
+            return biome?.Id ?? string.Empty;
+        }
+
+
+
+        private RegionId GetRegionAtTerrainTile(int terrainTileX, int terrainTileY)
+        {
+            int bcy = GetBiomeChunkYFromTerrainTileY(terrainTileY);
+            return _biomeMap.GetRegionAtChunkRow(bcy);
+        }
+
+
+
+        private void GetGroundTileFor(int terrainTileX, int terrainTileY, out int sourceId, out Vector2I atlas, out int alt)
+        {
+            string id = GetBiomeIdAtTerrainTile(terrainTileX, terrainTileY).ToLowerInvariant();
+            RegionId region = GetRegionAtTerrainTile(terrainTileX, terrainTileY);
+
+            if (id.Contains("lava") || id.Contains("magma") || id.Contains("basalt"))
+            {
+                sourceId = LavaSourceId;
+                atlas = LavaAtlasCoords;
+                alt = 0;
+                return;
+            }
+
+            if (id.Contains("crystal") || id.Contains("geode") || id.Contains("quartz"))
+            {
+                sourceId = CrystalSourceId;
+                atlas = CrystalAtlasCoords;
+                alt = 0;
+                return;
+            }
+
+            switch (region)
+            {
+                case RegionId.Sky:
+                    sourceId = SkySourceId;
+                    atlas = SkyAtlasCoords;
+                    alt = 0;
+                    return;
+
+                case RegionId.Surface:
+                    sourceId = SurfaceSourceId;
+                    atlas = SurfaceAtlasCoords;
+                    alt = 0;
+                    return;
+
+                default:
+                    sourceId = UndergroundSourceId;
+                    atlas = UndergroundAtlasCoords;
+                    alt = 0;
+                    return;
+            }
         }
     }
 }
