@@ -148,7 +148,7 @@ namespace BiomeArchitectV2.Terrain.Streaming
             for (int tx = startTileX; tx < endTileX; tx++)
             {
                 int dataX = _config.WrapX ? Mod(tx, _config.TerrainWidthTiles) : tx;
-                int surfaceY = HeightAtx(dataX, _config.TerrainHeightTiles, _seed);
+                int surfaceY = HeightAtx(dataX, _config.TerrainWidthTiles, _config.TerrainHeightTiles, _seed);
 
                 for (int ty = startTileY; ty < endTileY; ty++)
                 {
@@ -243,27 +243,29 @@ namespace BiomeArchitectV2.Terrain.Streaming
 
 
 
-        private static int HeightAtx(int x, int worldHeightTiles, int seed)
+        private static int HeightAtx(int x, int worldWidthTiles, int worldHeightTiles, int seed)
         {
+            x = Mod(x, worldWidthTiles);
+
             float baseY = worldHeightTiles * 0.35f;
             float a1 = worldHeightTiles * 0.03f;
             float a2 = worldHeightTiles * 0.06f;
             float a3 = worldHeightTiles * 0.02f;
 
-            float f1 = 0.005f;
-            float f2 = 0.0018f;
-            float f3 = 0.012f;
+            float w = Mathf.Tau / worldWidthTiles;
 
-            float s = seed * 0.0001f;
+            float p1 = seed * 0.00010f;
+            float p2 = seed * 0.00023f;
+            float p3 = seed * 0.00047f;
 
             float y =
                 baseY +
-                Mathf.Sin((x * f1) + s) * a1 +
-                Mathf.Sin((x * f2) + (s * 2f)) * a2 +
-                Mathf.Sin((x * f3) + (s * 5f)) * a3;
+                Mathf.Sin(w * 1f * x + p1) * a1 +
+                Mathf.Sin(w * 3f * x + p2) * a2 +
+                Mathf.Sin(w * 7f * x + p3) * a3;
 
             int iy = Mathf.RoundToInt(y);
-            iy = Mathf.Clamp(iy, 0, worldHeightTiles - 8);
+            iy = Mathf.Clamp(iy, 8, worldHeightTiles - 8);
 
             return iy;
         }
