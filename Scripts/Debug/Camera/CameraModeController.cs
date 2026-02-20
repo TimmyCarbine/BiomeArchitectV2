@@ -1,5 +1,6 @@
 using Godot;
 using BiomeArchitectV2.Player;
+using BiomeArchitectV2.Terrain.Streaming;
 
 namespace BiomeArchitectV2.Debug.Camera
 {
@@ -8,41 +9,47 @@ namespace BiomeArchitectV2.Debug.Camera
         [Export] private FreeCamCamera2D _freeCam = null!;
         [Export] private Camera2D _playerCam = null!;
         [Export] private PlayerController _player = null!;
+        [Export] private TerrainChunkStreamer _terrainStreamer = null!;
 
-        private bool _usingPlayerCam = false;
+        private bool _inspectMode = false;
+
+
+
+        public override void _Ready()
+        {
+            ApplyMode(inspectMode: false);
+        }
 
 
 
         public override void _Input(InputEvent @event)
         {
-            if (@event.IsActionPressed("toggle_camera_mode"))
-                ToggleCamera();
-
-            if (@event.IsActionPressed("toggle_player_control"))
-                TogglePlayerControl();
+            if (@event.IsActionPressed("toggle_debug_mode"))
+                ApplyMode(!_inspectMode);
         }
 
 
 
-        private void ToggleCamera()
+        private void ApplyMode(bool inspectMode)
         {
-            _usingPlayerCam = !_usingPlayerCam;
+            _inspectMode = inspectMode;
 
-            if (_usingPlayerCam)
+            if (_inspectMode)
+            {
+                _freeCam.MakeCurrent();
+                _player.ControlEnabled = false;
+                _terrainStreamer.SetFollowTarget(_freeCam);
+
+                GD.Print("INSPECT MODE");
+            }
+            else
             {
                 _playerCam.MakeCurrent();
                 _player.ControlEnabled = true;
+                _terrainStreamer.SetFollowTarget(_player);
+
+                GD.Print("PLAY MODE");
             }
-            else
-                _freeCam.MakeCurrent();
-        }
-
-
-
-        private void TogglePlayerControl()
-        {
-            _player.ControlEnabled = !_player.ControlEnabled;
-            _freeCam.ControlEnabled = !_player.ControlEnabled;
         }
     }
 }

@@ -14,6 +14,9 @@ namespace BiomeArchitectV2.Debug.Camera
         private const float MAX_ZOOM  = 5f;
         private const bool ENABLE_MIDDLE_MOUSE_DRAG  = true;
 
+        [Export] public Vector2 StartPosition { get; set; } = Vector2.Zero;
+        [Export] public Vector2 StartZoom { get; set; } = new Vector2(0.25f, 0.25f);
+
         private bool _isDragging;
         private Vector2 _dragStartMouseScreen;
         private Vector2 _dragStartCameraPos;
@@ -27,6 +30,8 @@ namespace BiomeArchitectV2.Debug.Camera
         {
             MakeCurrent();
             GetTree().Root.GrabFocus();
+            GlobalPosition = StartPosition;
+            Zoom = StartZoom;
         }
 
 

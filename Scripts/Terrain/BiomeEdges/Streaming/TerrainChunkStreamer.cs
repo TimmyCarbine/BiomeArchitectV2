@@ -72,6 +72,14 @@ namespace BiomeArchitectV2.Terrain.Streaming
 
 
 
+        public void SetFollowTarget(Node2D target)
+        {
+            _followTarget = target;
+            _lastCenterChunk = new Vector2I(int.MinValue, int.MaxValue);
+        }
+
+
+
         private void StreamWindow(Vector2I centerChunk)
         {
             int minX = centerChunk.X - StreamRadiusChunksX;

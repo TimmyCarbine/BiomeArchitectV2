@@ -41,6 +41,8 @@ _followTarget = NodePath("../Player")
 [node name="FreeCam" type="Camera2D" parent="WorldRoot"]
 zoom = Vector2(0.25, 0.25)
 script = ExtResource("6_bmxlf")
+StartPosition = Vector2(32700, 16100)
+StartZoom = Vector2(0.017, 0.017)
 
 [node name="Player" type="CharacterBody2D" parent="WorldRoot" node_paths=PackedStringArray("_sprite")]
 script = ExtResource("7_bmxlf")
@@ -56,11 +58,12 @@ texture = ExtResource("7_50glp")
 position_smoothing_enabled = true
 position_smoothing_speed = 12.0
 
-[node name="CameraModeController" type="Node" parent="WorldRoot" node_paths=PackedStringArray("_freeCam", "_playerCam", "_player")]
+[node name="CameraModeController" type="Node" parent="WorldRoot" node_paths=PackedStringArray("_freeCam", "_playerCam", "_player", "_terrainStreamer")]
 script = ExtResource("9_4kpch")
 _freeCam = NodePath("../FreeCam")
 _playerCam = NodePath("../Player/PlayerCamera")
 _player = NodePath("../Player")
+_terrainStreamer = NodePath("../TerrainChunkStreamer")
 
 [node name="DebugUI" type="CanvasLayer" parent="." node_paths=PackedStringArray("SeedEdit", "RandomiseButton", "RegenerateButton", "RegenTarget")]
 script = ExtResource("4_rgh2o")

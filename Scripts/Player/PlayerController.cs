@@ -17,7 +17,10 @@ namespace BiomeArchitectV2.Player
         public override void _PhysicsProcess(double delta)
         {
             if (!ControlEnabled)
+            {
+                Velocity = Vector2.Zero;
                 return;
+            }
 
             float dt = (float)delta;
 
