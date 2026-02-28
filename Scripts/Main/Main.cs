@@ -19,7 +19,7 @@ namespace BiomeArchitectV2
     {
         [Export] public int TerrainWidthTiles { get; set; } = 2048;
         [Export] public int TerrainHeightTiles { get; set; } = 1024;
-        [Export] public int WorldSeed { get; set; } = 12345;
+        [Export] public int WorldSeed { get; set; } = -2047984490;
 
         [Export] private BiomeChunkDebugRenderer _biomeRenderer = null!;
         [Export] private SeedControllerUI _seedUi = null!;
