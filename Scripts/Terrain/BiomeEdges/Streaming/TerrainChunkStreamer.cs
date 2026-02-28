@@ -3,6 +3,7 @@ using Godot;
 using BiomeArchitectV2.Core;
 using BiomeArchitectV2.Biomes.Maps;
 using BiomeArchitectV2.Biomes.Generation;
+using BiomeArchitectV2.Biomes.Defs;
 
 namespace BiomeArchitectV2.Terrain.Streaming
 {
@@ -15,9 +16,8 @@ namespace BiomeArchitectV2.Terrain.Streaming
         [Export] public int StreamRadiusChunksX { get; set; } = 3;
         [Export] public int StreamRadiusChunksY { get; set; } = 2;
         [Export] public bool AlwaysRefresh { get; set; } = false;
-        [Export] public int GroundSourceId { get; set; } = 0;
-        [Export] public Vector2I GroundAtlasCoords { get; set; } = new(1, 0);
-        [Export] public int GroundAlternative { get; set; } = 0;
+
+        [Export] public bool UseStraightVoronoiEdges { get; set; } = true;
 
         [Export] public int SkySourceId { get; set; } = 0;
         [Export] public Vector2I SkyAtlasCoords { get; set; } = new(0, 0);
@@ -34,6 +34,7 @@ namespace BiomeArchitectV2.Terrain.Streaming
 
         private WorldConfig _config = null!;
         private BiomeChunkMap _biomeMap = null!;
+        private BiomeTileMap _biomeTiles = null!;
         private int _seed;
         private Vector2I _lastCenterChunk = new(int.MinValue, int.MaxValue);
         private readonly HashSet<Vector2I> _loadedChunks = new();
@@ -41,11 +42,12 @@ namespace BiomeArchitectV2.Terrain.Streaming
 
 
 
-        public void Init(WorldConfig config, int seed, BiomeChunkMap biomeMap)
+        public void Init(WorldConfig config, int seed, BiomeChunkMap biomeMap, BiomeTileMap biomeTiles)
         {
             _config = config;
             _seed = seed;
             _biomeMap = biomeMap;
+            _biomeTiles = biomeTiles;
 
             _tileSizePx = GetTileSizePxOrFallback(_terrainLayer);
 
@@ -58,7 +60,7 @@ namespace BiomeArchitectV2.Terrain.Streaming
         public override void _Process(double delta)
         {
             if (_config == null) return;
-            if (_biomeMap == null) return;
+            if (_biomeTiles == null) return;
             if (_terrainLayer == null) return;
 
             Vector2I center = GetCenterTerrainChunk();
@@ -76,6 +78,13 @@ namespace BiomeArchitectV2.Terrain.Streaming
         {
             _followTarget = target;
             _lastCenterChunk = new Vector2I(int.MinValue, int.MaxValue);
+        }
+
+
+
+        public Vector2I GetTerrainTileSizePxForBuild()
+        {
+            return GetTileSizePxOrFallback(_terrainLayer);
         }
 
 
@@ -135,14 +144,14 @@ namespace BiomeArchitectV2.Terrain.Streaming
         {
             GetStartEndTiles(terrainChunkCoord, out int startTileX, out int endTileX, out int startTileY, out int endTileY);
 
-            endTileY = Mathf.Min(endTileY, _config.TerrainHeightTiles - 1);
+            endTileY = Mathf.Min(endTileY, _config.TerrainHeightTiles);
 
             if (!_config.WrapX)
             {
                 if (startTileX < 0 || startTileX >= _config.TerrainWidthTiles)
                     return;
 
-                endTileX = Mathf.Min(endTileX, _config.TerrainWidthTiles - 1);
+                endTileX = Mathf.Min(endTileX, _config.TerrainWidthTiles);
             }
 
             for (int tx = startTileX; tx < endTileX; tx++)
@@ -176,14 +185,14 @@ namespace BiomeArchitectV2.Terrain.Streaming
         {
             GetStartEndTiles(terrainChunkCoord, out int startTileX, out int endTileX, out int startTileY, out int endTileY);
 
-            endTileY = Mathf.Min(endTileY, _config.TerrainHeightTiles - 1);
+            endTileY = Mathf.Min(endTileY, _config.TerrainHeightTiles);
 
             if (!_config.WrapX)
             {
                 if (startTileX < 0 || startTileX >= _config.TerrainWidthTiles)
                     return;
 
-                endTileX = Mathf.Min(endTileX, _config.TerrainWidthTiles - 1);
+                endTileX = Mathf.Min(endTileX, _config.TerrainWidthTiles);
             }
 
             for (int tx = startTileX; tx < endTileX; tx++)
@@ -265,7 +274,7 @@ namespace BiomeArchitectV2.Terrain.Streaming
                 Mathf.Sin(w * 7f * x + p3) * a3;
 
             int iy = Mathf.RoundToInt(y);
-            iy = Mathf.Clamp(iy, 8, worldHeightTiles - 8);
+            iy = Mathf.Clamp(iy, 0, worldHeightTiles - 1);
 
             return iy;
         }
@@ -298,6 +307,83 @@ namespace BiomeArchitectV2.Terrain.Streaming
 
 
 
+        private Vector2I GetBiomeChunkCoordForTerrainTile(int terrainTileX, int terrainTileY)
+        {
+            if (!UseStraightVoronoiEdges)
+                return GetBaseBiomeChunkCoordForTerrainTile(terrainTileX, terrainTileY);
+
+            Vector2I baseBc = GetBaseBiomeChunkCoordForTerrainTile(terrainTileX, terrainTileY);
+            RegionId baseRegion = _biomeMap.GetRegionAtChunkRow(baseBc.Y);
+
+            int biomeChunkSizeTiles = _config.BiomeChunkWorldSizePx / _tileSizePx.X;
+            if (biomeChunkSizeTiles <= 0)
+                return baseBc;
+
+            int wx = _config.WrapX ? Mod(terrainTileX, _config.TerrainWidthTiles) : terrainTileX;
+            Vector2I best = baseBc;
+            long bestD2 = long.MaxValue;
+
+            for (int oy = -1; oy <= 1; oy++)
+            {
+                int by = baseBc.Y + oy;
+                if (by < 0 || by >= _biomeMap.ChunksY)
+                    continue;
+
+                if (_biomeMap.GetRegionAtChunkRow(by) != baseRegion)
+                    continue;
+
+                for (int ox = -1; ox <= 1; ox++)
+                {
+                    int bx = baseBc.X + ox;
+                    if (_config.WrapX)
+                        bx = Mod(bx, _biomeMap.ChunksX);
+                    else if (bx < 0 || bx >= _biomeMap.ChunksX)
+                        continue;
+
+                    if (_biomeMap.GetBiomeAtChunk(bx, by) == null)
+                        continue;
+
+                    int cx = bx * biomeChunkSizeTiles + biomeChunkSizeTiles / 2;
+                    int cy = by * biomeChunkSizeTiles + biomeChunkSizeTiles / 2;
+
+                    int dx = wx - cx;
+                    int dy = terrainTileY - cy;
+
+                    if (_config.WrapX)
+                    {
+                        int w = _config.TerrainWidthTiles;
+                        if (dx > w / 2) dx -= w;
+                        else if (dx < -w / 2) dx += w;
+                    }
+
+                    long d2 = (long)dx * dx + (long)dy * dy;
+                    if (d2 < bestD2)
+                    {
+                        bestD2 = d2;
+                        best = new Vector2I(bx, by);
+                    }
+                }
+            }
+            
+            return best;
+        }
+
+
+
+        private Vector2I GetBaseBiomeChunkCoordForTerrainTile(int terrainTileX, int terrainTileY)
+        {
+            int tx = _config.WrapX
+                ? Mod(terrainTileX, _config.TerrainWidthTiles)
+                : terrainTileX;
+
+            int bcx = GetBiomeChunkXFromTerrainTileX(tx);
+            int bcy = GetBiomeChunkYFromTerrainTileY(terrainTileY);
+
+            return new Vector2I(bcx, bcy);
+        }
+
+
+
         private int GetBiomeChunkXFromTerrainTileX(int terrainTileX)
         {
             int worldX = terrainTileX * _tileSizePx.X;
@@ -315,71 +401,86 @@ namespace BiomeArchitectV2.Terrain.Streaming
         {
             int worldY = terrainTileY * _tileSizePx.Y;
             int cy = worldY / _config.BiomeChunkWorldSizePx;
+
             return Mathf.Clamp(cy, 0, _biomeMap.ChunksY - 1);
+        }
+
+
+
+        private BiomeDef GetBiomeDefAtTerrainTile(int terrainTileX, int terrainTileY)
+        {
+            int wx = _config.WrapX ? Mod(terrainTileX, _config.TerrainWidthTiles) : terrainTileX;
+
+            if ((uint)wx >= (uint)_config.TerrainWidthTiles)
+                return null;
+
+            if ((uint)terrainTileY >= (uint)_config.TerrainHeightTiles)
+                return null;
+
+            byte b = _biomeTiles.Get(wx, terrainTileY);
+            if (b == BiomeTileMap.UNASSIGNED)
+                return null;
+
+            int idx = b;
+            if ((uint)idx >= (uint)_biomeMap.Biomes.Count)
+                return null;
+
+            return _biomeMap.Biomes[idx];
         }
 
 
 
         private string GetBiomeIdAtTerrainTile(int terrainTileX, int terrainTileY)
         {
-            int bcx = GetBiomeChunkXFromTerrainTileX(_config.WrapX ? Mod(terrainTileX, _config.TerrainWidthTiles) : terrainTileX);
-            int bcy = GetBiomeChunkYFromTerrainTileY(terrainTileY);
+            var biome = _biomeMap.GetBiomeAtChunk(terrainTileX, terrainTileY);
 
-            var biome = _biomeMap.GetBiomeAtChunk(bcx, bcy);
             return biome?.Id ?? string.Empty;
+        }
+
+
+
+        private byte GetBiomeIndexAtTerrainTile(int terrainTileX, int terrainTileY)
+        {
+            int wx = _config.WrapX ? Mod(terrainTileX, _config.TerrainWidthTiles) : terrainTileX;
+            wx = Mathf.Clamp(wx, 0, _config.TerrainWidthTiles - 1);
+            int y = Mathf.Clamp(terrainTileY, 0, _config.TerrainHeightTiles - 1);
+
+            return _biomeTiles.Get(wx, y);
         }
 
 
 
         private RegionId GetRegionAtTerrainTile(int terrainTileX, int terrainTileY)
         {
-            int bcy = GetBiomeChunkYFromTerrainTileY(terrainTileY);
-            return _biomeMap.GetRegionAtChunkRow(bcy);
+            var biome = GetBiomeDefAtTerrainTile(terrainTileX, terrainTileY);
+            return biome != null ? biome.Region : RegionId.Underground;
         }
 
 
 
         private void GetGroundTileFor(int terrainTileX, int terrainTileY, out int sourceId, out Vector2I atlas, out int alt)
         {
-            string id = GetBiomeIdAtTerrainTile(terrainTileX, terrainTileY).ToLowerInvariant();
-            RegionId region = GetRegionAtTerrainTile(terrainTileX, terrainTileY);
+            byte b = GetBiomeIndexAtTerrainTile(terrainTileX, terrainTileY);
 
-            if (id.Contains("lava") || id.Contains("magma") || id.Contains("basalt"))
+            if (b == 0)
             {
-                sourceId = LavaSourceId;
-                atlas = LavaAtlasCoords;
+                sourceId = SkySourceId;
+                atlas = SkyAtlasCoords;
+                alt = 0;
+                return;
+            }
+            if (b == 1)
+            {
+                sourceId = SurfaceSourceId;
+                atlas = SurfaceAtlasCoords;
                 alt = 0;
                 return;
             }
 
-            if (id.Contains("crystal") || id.Contains("geode") || id.Contains("quartz"))
-            {
-                sourceId = CrystalSourceId;
-                atlas = CrystalAtlasCoords;
-                alt = 0;
-                return;
-            }
-
-            switch (region)
-            {
-                case RegionId.Sky:
-                    sourceId = SkySourceId;
-                    atlas = SkyAtlasCoords;
-                    alt = 0;
-                    return;
-
-                case RegionId.Surface:
-                    sourceId = SurfaceSourceId;
-                    atlas = SurfaceAtlasCoords;
-                    alt = 0;
-                    return;
-
-                default:
-                    sourceId = UndergroundSourceId;
-                    atlas = UndergroundAtlasCoords;
-                    alt = 0;
-                    return;
-            }
+            sourceId = UndergroundSourceId;
+            atlas = UndergroundAtlasCoords;
+            alt = 0;
+            return;
         }
     }
 }

@@ -39,7 +39,7 @@ namespace BiomeArchitectV2
 
             RegenerateWithSeed(WorldSeed);   
 
-            _player.GlobalPosition = new Vector2(200, 0);         
+            _player.GlobalPosition = new Vector2(200, 0);        
         }
 
 
@@ -57,9 +57,12 @@ namespace BiomeArchitectV2
             BiomeChunkGrowthResult growthResult = BiomeChunkGrower.Run(_config, bands, seedResult);
             BiomeChunkMap biomeMap = new BiomeChunkMap(_config, bands, growthResult);
 
+            Vector2I terrainTileSizePx = _terrainStreamer.GetTerrainTileSizePxForBuild();
+            BiomeTileMap biomeTiles = BiomeTileMapBuilder.BuildFromChunkMap(_config, biomeMap, terrainTileSizePx);
+
             _terrainRenderer.Init(_config, WorldSeed, biomeMap);
             _biomeRenderer.Init(_config, WorldSeed, bands, growthResult);
-            _terrainStreamer.Init(_config, WorldSeed, biomeMap);
+            _terrainStreamer.Init(_config, WorldSeed, biomeMap, biomeTiles);
 
             LogTerrainResult();
             LogSelectionResult(selectionResult);
