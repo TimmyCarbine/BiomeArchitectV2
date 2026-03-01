@@ -1,4 +1,4 @@
-[gd_resource type="TileSet" load_steps=3 format=3 uid="uid://d4nh5qh11d8dj"]
+[gd_resource type="TileSet" format=3 uid="uid://d4nh5qh11d8dj"]
 
 [ext_resource type="Texture2D" uid="uid://b8812f6fa4w1c" path="res://Assets/Tiles/terrain_debug.png" id="1_fsq6f"]
 
@@ -13,6 +13,8 @@ texture_region_size = Vector2i(32, 32)
 2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
 3:0/0 = 0
 3:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+4:0/0 = 0
+4:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
 
 [resource]
 tile_size = Vector2i(32, 32)

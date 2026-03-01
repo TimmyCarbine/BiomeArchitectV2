@@ -68,9 +68,8 @@ namespace BiomeArchitectV2.Debug.Biomes
                             if (owner >= 0 && owner < _growth.Biomes.Count)
                             {
                                 BiomeDef biome = _growth.Biomes[owner];
-                                Color biomeColor = GetDeterministicBiomeColor(biome.Id, _seed);
                                 
-                                fill = ApplyRegionLighting(biomeColor, region);
+                                fill = ApplyRegionLighting(biome.Colour, region);
                                 fill.A = 1f;
                             }
                             else
@@ -99,29 +98,6 @@ namespace BiomeArchitectV2.Debug.Biomes
                 RegionId.Surface => new Color(0.55f, 0.55f, 0.55f, 1f),
                 _ => new Color(0.20f, 0.20f, 0.20f, 1f),
             };
-        }
-
-
-
-        private static Color GetDeterministicBiomeColor(string biomeId, int seed)
-        {
-            int h = seed;
-            for (int i = 0; i < biomeId.Length; i++)
-                h = unchecked(h * 31 + biomeId[i]);
-
-            h ^= (h << 13);
-            h ^= (h >> 17);
-            h ^= (h << 5);
-
-            float r = ((h >> 0) & 0xFF) / 255f;
-            float g = ((h >> 8) & 0xFF) / 255f;
-            float b = ((h >> 16) & 0xFF) / 255f;
-
-            r = 0.25f + 0.75f * r;
-            g = 0.25f + 0.75f * g;
-            b = 0.25f + 0.75f * b;
-
-            return new Color(r, g, b, 1f);
         }
 
 

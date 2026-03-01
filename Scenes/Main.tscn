@@ -1,9 +1,9 @@
-[gd_scene load_steps=12 format=3 uid="uid://c3rt81sglhq7j"]
+[gd_scene format=3 uid="uid://c3rt81sglhq7j"]
 
 [ext_resource type="Script" uid="uid://c4u4dj3t2tsn7" path="res://Scripts/Main/Main.cs" id="1_r150o"]
 [ext_resource type="Script" uid="uid://dfn0csysmgrik" path="res://Scripts/Debug/Biomes/BiomeChunkDebugRenderer.cs" id="2_rgh2o"]
 [ext_resource type="Script" uid="uid://cet00n7yuhnv2" path="res://Scripts/Debug/Terrain/TerrainStubDebugRenderer.cs" id="3_pbw6q"]
-[ext_resource type="TileSet" uid="uid://d4nh5qh11d8dj" path="res://Assets/TileSets/TerrainTileSet.tres" id="4_jw32o"]
+[ext_resource type="TileSet" uid="uid://1hkg1n6duxx3" path="res://Assets/TileSets/TerrainTextureTileSet.tres" id="4_bmxlf"]
 [ext_resource type="Script" uid="uid://cc5woforrv1sr" path="res://Scripts/UI/SeedControllerUI.cs" id="4_rgh2o"]
 [ext_resource type="Script" uid="uid://dbiepai3vf1j7" path="res://Scripts/Terrain/BiomeEdges/Streaming/TerrainChunkStreamer.cs" id="5_50glp"]
 [ext_resource type="Script" uid="uid://bjcdqtirtderj" path="res://Scripts/Debug/Camera/FreeCamCamera2D.cs" id="6_bmxlf"]
@@ -13,7 +13,7 @@
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_vy5pj"]
 
-[node name="Main" type="Node2D" node_paths=PackedStringArray("_biomeRenderer", "_seedUi", "_terrainRenderer", "_terrainStreamer", "_player")]
+[node name="Main" type="Node2D" unique_id=2067521639 node_paths=PackedStringArray("_biomeRenderer", "_seedUi", "_terrainRenderer", "_terrainStreamer", "_player")]
 script = ExtResource("1_r150o")
 _biomeRenderer = NodePath("WorldRoot/BiomeChunkDebugRenderer")
 _seedUi = NodePath("DebugUI")
@@ -21,79 +21,79 @@ _terrainRenderer = NodePath("WorldRoot/TerrainStubDebugRenderer")
 _terrainStreamer = NodePath("WorldRoot/TerrainChunkStreamer")
 _player = NodePath("WorldRoot/Player")
 
-[node name="WorldRoot" type="Node2D" parent="."]
+[node name="WorldRoot" type="Node2D" parent="." unique_id=365664259]
 
-[node name="BiomeChunkDebugRenderer" type="Node2D" parent="WorldRoot"]
+[node name="BiomeChunkDebugRenderer" type="Node2D" parent="WorldRoot" unique_id=632096729]
 script = ExtResource("2_rgh2o")
 
-[node name="TerrainStubDebugRenderer" type="Node2D" parent="WorldRoot"]
+[node name="TerrainStubDebugRenderer" type="Node2D" parent="WorldRoot" unique_id=1262919623]
 script = ExtResource("3_pbw6q")
 Enabled = false
 
-[node name="TerrainLayer" type="TileMapLayer" parent="WorldRoot"]
-tile_set = ExtResource("4_jw32o")
+[node name="TerrainLayer" type="TileMapLayer" parent="WorldRoot" unique_id=77504226]
+tile_set = ExtResource("4_bmxlf")
 
-[node name="TerrainChunkStreamer" type="Node2D" parent="WorldRoot" node_paths=PackedStringArray("_terrainLayer", "_followTarget")]
+[node name="TerrainChunkStreamer" type="Node2D" parent="WorldRoot" unique_id=517191068 node_paths=PackedStringArray("_terrainLayer", "_followTarget")]
 script = ExtResource("5_50glp")
 _terrainLayer = NodePath("../TerrainLayer")
 _followTarget = NodePath("../Player")
 
-[node name="FreeCam" type="Camera2D" parent="WorldRoot"]
+[node name="FreeCam" type="Camera2D" parent="WorldRoot" unique_id=56594366]
 zoom = Vector2(0.25, 0.25)
 script = ExtResource("6_bmxlf")
 StartPosition = Vector2(32700, 16100)
 StartZoom = Vector2(0.017, 0.017)
 
-[node name="Player" type="CharacterBody2D" parent="WorldRoot" node_paths=PackedStringArray("_sprite")]
+[node name="Player" type="CharacterBody2D" parent="WorldRoot" unique_id=98450999 node_paths=PackedStringArray("_sprite")]
 script = ExtResource("7_bmxlf")
 _sprite = NodePath("Sprite2D")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WorldRoot/Player"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WorldRoot/Player" unique_id=1810737344]
 shape = SubResource("CapsuleShape2D_vy5pj")
 
-[node name="Sprite2D" type="Sprite2D" parent="WorldRoot/Player"]
+[node name="Sprite2D" type="Sprite2D" parent="WorldRoot/Player" unique_id=1404782639]
 texture = ExtResource("7_50glp")
 
-[node name="PlayerCamera" type="Camera2D" parent="WorldRoot/Player"]
+[node name="PlayerCamera" type="Camera2D" parent="WorldRoot/Player" unique_id=400547556]
 position_smoothing_enabled = true
 position_smoothing_speed = 12.0
 
-[node name="CameraModeController" type="Node" parent="WorldRoot" node_paths=PackedStringArray("_freeCam", "_playerCam", "_player", "_terrainStreamer")]
+[node name="CameraModeController" type="Node" parent="WorldRoot" unique_id=441819977 node_paths=PackedStringArray("_freeCam", "_playerCam", "_player", "_terrainStreamer")]
 script = ExtResource("9_4kpch")
 _freeCam = NodePath("../FreeCam")
 _playerCam = NodePath("../Player/PlayerCamera")
 _player = NodePath("../Player")
 _terrainStreamer = NodePath("../TerrainChunkStreamer")
 
-[node name="DebugUI" type="CanvasLayer" parent="." node_paths=PackedStringArray("SeedEdit", "RandomiseButton", "RegenerateButton", "RegenTarget")]
+[node name="DebugUI" type="CanvasLayer" parent="." unique_id=975285288 node_paths=PackedStringArray("SeedEdit", "RandomiseButton", "RegenerateButton", "RegenTarget")]
 script = ExtResource("4_rgh2o")
 SeedEdit = NodePath("Panel/Row/SeedEdit")
 RandomiseButton = NodePath("Panel/Row/RandomiseButton")
 RegenerateButton = NodePath("Panel/Row/RegenerateButton")
 RegenTarget = NodePath("..")
 
-[node name="Panel" type="PanelContainer" parent="DebugUI"]
+[node name="Panel" type="PanelContainer" parent="DebugUI" unique_id=1126684055]
 custom_minimum_size = Vector2(300, 0)
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="Row" type="HBoxContainer" parent="DebugUI/Panel"]
+[node name="Row" type="HBoxContainer" parent="DebugUI/Panel" unique_id=594585540]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="SeedLabel" type="Label" parent="DebugUI/Panel/Row"]
+[node name="SeedLabel" type="Label" parent="DebugUI/Panel/Row" unique_id=271784246]
 layout_mode = 2
 text = "Seed: "
 vertical_alignment = 1
 
-[node name="SeedEdit" type="LineEdit" parent="DebugUI/Panel/Row"]
+[node name="SeedEdit" type="LineEdit" parent="DebugUI/Panel/Row" unique_id=1127407660]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 
-[node name="RandomiseButton" type="Button" parent="DebugUI/Panel/Row"]
+[node name="RandomiseButton" type="Button" parent="DebugUI/Panel/Row" unique_id=1646204258]
 layout_mode = 2
 text = "Randomise"
 
-[node name="RegenerateButton" type="Button" parent="DebugUI/Panel/Row"]
+[node name="RegenerateButton" type="Button" parent="DebugUI/Panel/Row" unique_id=1100544389]
 layout_mode = 2
 text = "Regenerate"
