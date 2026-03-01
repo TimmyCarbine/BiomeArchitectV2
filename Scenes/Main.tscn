@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://c4u4dj3t2tsn7" path="res://Scripts/Main/Main.cs" id="1_r150o"]
 [ext_resource type="Script" uid="uid://dfn0csysmgrik" path="res://Scripts/Debug/Biomes/BiomeChunkDebugRenderer.cs" id="2_rgh2o"]
 [ext_resource type="Script" uid="uid://cet00n7yuhnv2" path="res://Scripts/Debug/Terrain/TerrainStubDebugRenderer.cs" id="3_pbw6q"]
-[ext_resource type="TileSet" uid="uid://d4nh5qh11d8dj" path="res://Assets/TileSets/TerrainTileSet.tres" id="4_jw32o"]
+[ext_resource type="TileSet" uid="uid://1hkg1n6duxx3" path="res://Assets/TileSets/TerrainTextureTileSet.tres" id="4_bmxlf"]
 [ext_resource type="Script" uid="uid://cc5woforrv1sr" path="res://Scripts/UI/SeedControllerUI.cs" id="4_rgh2o"]
 [ext_resource type="Script" uid="uid://dbiepai3vf1j7" path="res://Scripts/Terrain/BiomeEdges/Streaming/TerrainChunkStreamer.cs" id="5_50glp"]
 [ext_resource type="Script" uid="uid://bjcdqtirtderj" path="res://Scripts/Debug/Camera/FreeCamCamera2D.cs" id="6_bmxlf"]
@@ -31,7 +31,7 @@ script = ExtResource("3_pbw6q")
 Enabled = false
 
 [node name="TerrainLayer" type="TileMapLayer" parent="WorldRoot" unique_id=77504226]
-tile_set = ExtResource("4_jw32o")
+tile_set = ExtResource("4_bmxlf")
 
 [node name="TerrainChunkStreamer" type="Node2D" parent="WorldRoot" unique_id=517191068 node_paths=PackedStringArray("_terrainLayer", "_followTarget")]
 script = ExtResource("5_50glp")

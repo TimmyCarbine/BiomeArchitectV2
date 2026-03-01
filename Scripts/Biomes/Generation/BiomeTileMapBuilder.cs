@@ -264,31 +264,49 @@ namespace BiomeArchitectV2.Biomes.Generation
             int south = SameRegion(by + 1) ? GetOwnerAt(bx, by + 1) : -1;
             int north = SameRegion(by - 1) ? GetOwnerAt(bx, by - 1) : -1;
 
-            if (east >= 0 && south >= 0 && east == south && (byte)east != ownerA)
-            {
-                if (lx + ly >= biomeChunkSizeTiles - 1)
-                    return (byte)east;
-                return ownerA;
-            }
+            // --- Add diagonal chunk sampling (these are the missing pieces) ---
+            int southEast = SameRegion(by + 1) ? GetOwnerAt(bx + 1, by + 1) : -1;
+            int southWest = SameRegion(by + 1) ? GetOwnerAt(bx - 1, by + 1) : -1;
+            int northEast = SameRegion(by - 1) ? GetOwnerAt(bx + 1, by - 1) : -1;
+            int northWest = SameRegion(by - 1) ? GetOwnerAt(bx - 1, by - 1) : -1;
 
-            if (west >= 0 && south >= 0 && west == south && (byte)west != ownerA)
+            // --- SE corner: only diagonalise if the whole 2x2 agrees (E, S, SE) ---
+            // if (east >= 0 && south >= 0 && southEast >= 0 && east == south && east == southEast && (byte)east != ownerA)
+            // {
+            //     // Fill the SE half of this chunk with the neighbour biome (clean diagonal)
+            //     if (lx + ly >= biomeChunkSizeTiles - 1)
+            //         return (byte)east;
+
+            //     return ownerA;
+            // }
+
+            // --- SW corner: require W, S, SW ---
+            if (west >= 0 && south >= 0 && southWest >= 0 &&
+                west == south && west == southWest && (byte)west != ownerA)
             {
                 if ((biomeChunkSizeTiles - 1 - lx) + ly >= biomeChunkSizeTiles - 1)
                     return (byte)west;
+
                 return ownerA;
             }
 
-            if (east >= 0 && north >= 0 && east == north && (byte)east != ownerA)
-            {
-                if (lx + (biomeChunkSizeTiles - 1 - ly) >= biomeChunkSizeTiles - 1)
-                    return (byte)east;
-                return ownerA;
-            }
+            // --- NE corner: require E, N, NE ---
+            // if (east >= 0 && north >= 0 && northEast >= 0 &&
+            //     east == north && east == northEast && (byte)east != ownerA)
+            // {
+            //     if (lx + (biomeChunkSizeTiles - 1 - ly) >= biomeChunkSizeTiles - 1)
+            //         return (byte)east;
 
-            if (west >= 0 && north >= 0 && west == north && (byte)west != ownerA)
+            //     return ownerA;
+            // }
+
+            // --- NW corner: require W, N, NW ---
+            if (west >= 0 && north >= 0 && northWest >= 0 &&
+                west == north && west == northWest && (byte)west != ownerA)
             {
                 if ((biomeChunkSizeTiles - 1 - lx) + (biomeChunkSizeTiles - 1 - ly) >= biomeChunkSizeTiles - 1)
                     return (byte)west;
+
                 return ownerA;
             }
 

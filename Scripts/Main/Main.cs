@@ -39,7 +39,7 @@ namespace BiomeArchitectV2
 
             RegenerateWithSeed(WorldSeed);   
 
-            _player.GlobalPosition = new Vector2(200, 0);        
+            _player.GlobalPosition = new Vector2(15000, 0);        
         }
 
 
